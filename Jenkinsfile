@@ -1,9 +1,7 @@
 pipeline {
     agent any // Specifies that Jenkins can use any available agent (node) to run this pipeline
 
-    environment {
-        // Define environment variables if needed later
-    }
+    // The empty environment block that caused the error has been removed
 
     stages {
         stage('1. Checkout Code') {
