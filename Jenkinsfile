@@ -1,55 +1,48 @@
 pipeline {
-    // Define the agent for the entire pipeline
     agent {
         docker {
-            image 'python:3.11-slim' // Use a specific Python 3.9 image (slim version is smaller)
-            // args '-v /var/run/docker.sock:/var/run/docker.sock' // Uncomment if you need Docker inside Docker later
-            // reuseNode true // Optional: Can speed up builds by reusing the node, but manage workspace carefully
+            image 'python:3.11-slim'
         }
     }
 
     stages {
         stage('1. Checkout Code') {
-            // Note: Checkout happens before the agent typically starts,
-            // but the files become available in the agent's workspace.
             steps {
                 echo 'Checking out code from GitHub...'
                 checkout scm
             }
         }
 
-        stage('2. Setup Python Environment') {
+        stage('2. Setup Python Environment & Install Deps') {
             steps {
-                echo 'Setting up Python environment inside Docker container...'
+                echo 'Setting up Python virtual environment...'
                 script {
-                    // These should now work inside the python:3.9-slim container
                     sh 'python3 --version'
-                    sh 'pip3 --version'
-                    echo 'Installing dependencies from requirements.txt...'
-                    // Use --user or consider virtual environments if preferred
-                    sh 'pip3 install --user -r requirements.txt'
-                    // Add ~/.local/bin to PATH if using --user, needed for scripts installed by pip
-                    env.PATH = "$HOME/.local/bin:${env.PATH}"
+                    // Create a virtual environment named 'venv' in the workspace
+                    sh 'python3 -m venv venv'
+                    echo 'Installing dependencies into virtual environment...'
+                    // Activate venv and install (use absolute path to pip within venv)
+                    // Run pip install without --user, it installs into the venv
+                    sh './venv/bin/pip install -r requirements.txt'
+                    // No need to modify PATH when using venv explicitly
                 }
             }
         }
 
         stage('3. Run Basic Tests (Training Script)') {
             steps {
-                echo 'Running basic tests (executing training script)...'
+                echo 'Running basic tests (executing training script using venv)...'
                 script {
-                    // This should now work as python3 and libraries are available
-                    sh 'python3 train_model.py'
+                    // Execute the script using the python interpreter from the virtual environment
+                    sh './venv/bin/python train_model.py'
                 }
             }
         }
-        // We will add Docker build stages later
     }
 
-    post { // Actions performed after the pipeline finishes
+    post {
         always {
             echo 'Pipeline execution finished.'
-            // cleanWs() // Consider cleaning workspace, especially if not reusing node
         }
         success {
             echo 'Pipeline completed successfully!'
