@@ -44,15 +44,23 @@ pipeline {
                 echo 'Building the Docker image for the predictor app...'
                 node('built-in') {
                     echo "Switched to node: ${env.NODE_NAME}. Checking out code here..."
-                    // Checkout source code into the workspace of the built-in node
                     checkout scm
 
+                    // --- START DEBUGGING ---
+                    echo "DEBUG: Checking environment on controller node..."
+                    sh 'echo USER: $(whoami)' // Check which user is running this
+                    sh 'echo PATH: $PATH'     // Print the command search path
+                    sh 'which docker || echo "DEBUG: \'which docker\' did not find docker in PATH"' // Try to locate docker via PATH
+                    sh 'ls -l /usr/bin/docker || echo "DEBUG: Docker command not found at /usr/bin/docker"' // Check if file exists at standard location
+                    // --- END DEBUGGING ---
+
                     echo "Running docker build..."
+                    // Run the build command (keep it simple for now)
                     sh 'docker build -t titanic-predictor:latest .'
+
                 }
             }
         }
-    }
 
     post {
         always {
