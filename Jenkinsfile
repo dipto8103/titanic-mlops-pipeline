@@ -38,6 +38,23 @@ pipeline {
                 }
             }
         }
+
+        stage('4. Build Docker Image') {
+            steps {
+                echo 'Building the Docker image for the predictor app...'
+                script {
+                    // Use the same command we used manually
+                    // This runs on the Jenkins controller, using the mounted docker.sock
+                    // Therefore, we need agent 'none' or run it outside the python agent scope technically
+                    // But since the docker CLI is installed on controller and socket mounted, this might work directly.
+                    sh 'docker build -t titanic-predictor:latest .'
+                    // Alternatively, to run it explicitly on the controller node:
+                    // node('built-in') { // Or use the specific node name if not default
+                    //    sh 'docker build -t titanic-predictor:latest .'
+                    // }
+                }
+            }
+        }
     }
 
     post {
