@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'python:3.11But.'
+            image 'python:3.11' // Use the official Python 3.11 Docker image
         }
     }
 
@@ -51,4 +51,4 @@ pipeline {
             echo 'Pipeline failed.'
         }
     }
-}SMS Susan. Spell belly. Each. SMS beth. 
+}
