@@ -82,6 +82,8 @@ print("Model training completed.")
 # --- 7. Evaluate the Model ---
 print("\n--- Model Evaluation ---")
 y_pred = model_pipeline.predict(X_test)
+print(f"Predictions made for {len(y_pred)} samples.")
+print(f"First 5 predictions: {y_pred[:5]}")
 
 # Calculate accuracy
 accuracy = accuracy_score(y_test, y_pred)
