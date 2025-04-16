@@ -61,7 +61,8 @@ pipeline {
                 }
             }
         }
-
+    }
+    
     post {
         always {
             echo 'Pipeline execution finished.'
