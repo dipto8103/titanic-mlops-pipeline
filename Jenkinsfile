@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.11' // Use the official Python 3.11 Docker image
-        }
-    }
+    agent any // Run steps directly on the controller node
 
     stages {
         stage('1. Checkout Code') {
@@ -13,44 +9,28 @@ pipeline {
             }
         }
 
-        stage('2. Setup Python Environment & Install Deps') {
+        stage('2. Install Dependencies') {
             steps {
-                echo 'Setting up Python virtual environment...'
-                script {
-                    sh 'python3 --version'
-                    // Create a virtual environment named 'venv' in the workspace
-                    sh 'python3 -m venv venv'
-                    echo 'Installing dependencies into virtual environment...'
-                    // Activate venv and install (use absolute path to pip within venv)
-                    // Run pip install without --user, it installs into the venv
-                    sh './venv/bin/pip install -r requirements.txt'
-                    // No need to modify PATH when using venv explicitly
-                }
+                echo 'Installing Python dependencies on controller...'
+                // Python 3 & Pip come from the custom Docker image
+                sh 'python3 --version'
+                sh 'pip3 --version'
+                // Install dependencies using --user to avoid needing root here
+                sh 'pip3 install --user -r requirements.txt'
+                // Add the user's local bin directory to PATH for this pipeline run
+                // This ensures subsequent stages can find any executables installed by pip
+                env.PATH = "$HOME/.local/bin:${env.PATH}"
             }
         }
 
-        stage('3. Run Basic Tests (Training Script)') {
+        stage('3. Run Training Script') {
             steps {
-                echo 'Running basic tests (executing training script using venv)...'
-                script {
-                    // Execute the script using the python interpreter from the virtual environment
-                    sh './venv/bin/python train_model.py'
-                }
+                echo 'Running training script...'
+                // Python3 should be in PATH, packages should be importable
+                sh 'python3 train_model.py'
             }
         }
-
-        stage('4. Build Docker Image') {
-            steps {
-                echo 'Building the Docker image for the predictor app...'
-                node('built-in') {
-                    echo "Switched to node: ${env.NODE_NAME}. Checking out code here..."
-                    checkout scm
-                    echo "Running docker build..."
-                    sh 'docker build -t titanic-predictor:latest .'
-                }
-            }
-        }
-    }
+    } // End stages
 
     post {
         always {
@@ -62,5 +42,5 @@ pipeline {
         failure {
             echo 'Pipeline failed.'
         }
-    }
-}
+    } // End post
+} // End pipeline
