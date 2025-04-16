@@ -1,0 +1,36 @@
+# Git files
+.git
+.gitignore
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# Python virtual environment
+venv/
+.venv/
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.eggs
+*.egg-info
+dist/
+build/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files (optional)
+.vscode/
+.idea/
+
+# Any large data files not needed in the final image
+# train.csv # We don't need the training data in the prediction image
+# test.csv
+
+# Jenkins file (not needed in prediction image)
+Jenkinsfile
