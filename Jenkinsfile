@@ -2,7 +2,7 @@ pipeline {
     // Define the agent for the entire pipeline
     agent {
         docker {
-            image 'python:3.9-slim' // Use a specific Python 3.9 image (slim version is smaller)
+            image 'python:3.11-slim' // Use a specific Python 3.9 image (slim version is smaller)
             // args '-v /var/run/docker.sock:/var/run/docker.sock' // Uncomment if you need Docker inside Docker later
             // reuseNode true // Optional: Can speed up builds by reusing the node, but manage workspace carefully
         }
